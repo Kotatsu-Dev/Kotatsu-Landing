@@ -1,0 +1,124 @@
+/* ---- Страница правил: уникальные стили ---- */
+.sidebar {
+  flex: 0 0 380px;
+  max-width: 38%;
+  padding: 24px 18px;
+  overflow: hidden;
+}
+
+.nav-sep { height: 1px; background: var(--border); margin: 12px 6px; border: 0; }
+
+/* ---- Оглавление ---- */
+.toc { counter-reset: toc; }
+.toc a { gap: 10px; }
+.toc a::before { content: counter(toc) "."; counter-increment: toc; color: var(--muted); }
+.toc a.plain::before { content: none; }
+/* в меню оглавление — единственная прокручиваемая часть */
+.sidebar .toc { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+
+/* ---- Липкая полоса с разделами: только на мобильных ---- */
+.toc-bar { display: none; }
+
+/* ---- Правый блок: документ ---- */
+.doc-bar {
+  flex: 0 0 auto;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.doc-bar h1 { margin: 0; font-size: 27px; font-weight: 700; line-height: 1.15; }
+.doc-bar span { display: block; font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.doc-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  padding: 4px 24px 28px;
+  line-height: 1.4;
+  counter-reset: sec;
+}
+.doc-body section { counter-increment: sec; counter-reset: item; }
+/* якорь не прилипает к верху: отступ = межстрочный интервал (25.2 − 18 ≈ 7px) */
+.doc-body section, .doc-body li[id] { scroll-margin-top: 7px; }
+.doc-body h2 { font-size: 18px; font-weight: 700; margin: 28px 0 10px; }
+.doc-body h2::before { content: counter(sec) ". "; }
+.doc-body h3 { font-size: 18px; font-weight: 500; color: var(--muted); margin: 20px 0 8px; }
+.doc-body .no-num { counter-increment: none; }
+.doc-body .no-num h2::before { content: none; }
+
+.doc-body ol, .doc-body ul { margin: 0; padding: 0; list-style: none; }
+.doc-body li { margin: 8px 0; }
+.doc-body li > ul, .doc-body li > ol { margin: 8px 0 12px; }
+.doc-body p { margin: 8px 0; }
+
+.doc-body ol > li { position: relative; padding-left: 46px; }
+.doc-body ol > li::before {
+  position: absolute; left: 0; top: 0;
+  color: var(--muted);
+}
+.doc-body section > ol > li { counter-reset: sub; }
+.doc-body section > ol > li::before {
+  counter-increment: item;
+  content: counter(sec) "." counter(item) ".";
+}
+/* третий уровень нумерации: 4.4.1 */
+.doc-body section > ol > li > ol > li { padding-left: 52px; }
+.doc-body section > ol > li > ol > li::before {
+  counter-increment: sub;
+  content: counter(sec) "." counter(item) "." counter(sub) ".";
+}
+.doc-body ul > li { position: relative; padding-left: 22px; }
+.doc-body ul > li::before { content: "•"; position: absolute; left: 6px; top: 0; color: var(--muted); }
+.doc-body ul > li > strong { font-weight: 700; }
+
+/* ---- Адаптив ---- */
+@media (max-width: 780px) {
+  /* меню и документ сливаются в одну карточку: их боксы убираются,
+     содержимое становится прямыми детьми .layout */
+  .layout {
+    flex-direction: column;
+    height: auto;
+    gap: 0;
+    padding: 18px 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+  .sidebar, .main { display: contents; }
+  .footer-note { order: 1; }
+
+  /* блоки меню отступают от края карточки на 10 px — как в сайдбаре главной */
+  .brand { padding: 4px 0 12px; margin: 0 10px 12px; }
+  .sidebar nav, .footer-note { margin-left: 10px; margin-right: 10px; }
+  .doc-bar { padding: 14px 10px; }
+  .doc-body { overflow: visible; padding: 4px 14px 20px; }
+  /* 45 px липкой полосы + межстрочный интервал */
+  .doc-body section, .doc-body li[id] { scroll-margin-top: 52px; }
+
+  /* оглавление переезжает из меню в липкую полосу */
+  .sidebar > .nav-sep, .sidebar .toc { display: none; }
+  .toc-bar {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+  }
+  .toc-bar summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 22px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    list-style: none;
+  }
+  .toc-bar summary::-webkit-details-marker { display: none; }
+  .toc-bar summary svg { width: 26px; height: 26px; flex: none; color: var(--muted); }
+  .toc-bar summary::after { content: "▾"; margin-left: auto; color: var(--muted); }
+  .toc-bar[open] summary::after { content: "▴"; }
+  .toc-bar .toc { padding: 0 10px 10px; max-height: 60vh; overflow-y: auto; }
+}

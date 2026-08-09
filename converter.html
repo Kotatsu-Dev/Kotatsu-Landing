@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конвертёр аниме-списков в MAL XML — Котацу</title>
+<meta name="description" content="Бесплатный конвертёр списков аниме из Шикимори, YummyAnime и Anixart в формат XML для импорта в MyAnimeList или AniList. Работает прямо в браузере.">
+<link rel="canonical" href="https://kotatsu.spb.ru/converter">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Котацу">
+<meta property="og:title" content="Конвертёр аниме-списков в MAL XML — Котацу">
+<meta property="og:description" content="Перенос списков аниме из Шикимори, YummyAnime и Anixart в формат MyAnimeList/AniList. Работает прямо в браузере, без установки.">
+<meta property="og:url" content="https://kotatsu.spb.ru/converter">
+<meta property="og:image" content="https://kotatsu.spb.ru/og-image.png">
+<meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Конвертёр аниме-списков в MAL XML — Котацу">
+<meta name="twitter:description" content="Перенос списков аниме из Шикимори, YummyAnime и Anixart в формат MyAnimeList/AniList.">
+<meta name="twitter:image" content="https://kotatsu.spb.ru/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Котацу",
+  "alternateName": "Аниме-клуб Университета ИТМО",
+  "url": "https://kotatsu.spb.ru/",
+  "logo": "https://kotatsu.spb.ru/avatar_mascot.webp",
+  "email": "kotatsu@itmo.ru",
+  "sameAs": [
+    "https://t.me/anime_itmo",
+    "https://discord.gg/Vxj9PFj2Jt",
+    "https://youtube.com/@anime_itmo",
+    "https://twitch.tv/kotatsu_club",
+    "https://github.com/Kotatsu-Dev"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Конвертёр аниме-списков",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any (веб-браузер)",
+  "url": "https://kotatsu.spb.ru/converter",
+  "description": "Конвертирует списки аниме из Шикимори, YummyAnime и Anixart в формат MyAnimeList XML для импорта в MyAnimeList или AniList.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "RUB"
+  }
+}
+</script>
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="Котацу" />
+<link rel="manifest" href="/site.webmanifest" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/shared.css">
+<link rel="stylesheet" href="/css/converter.css">
+</head>
+<body>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-head">
+          <!-- Аватар клуба -->
+          <img class="mark" src="/avatar_mascot.webp" alt="Логотип Котацу">
+
+          <div>
+            <p class="brand-title">Котацу</p>
+            <span>Аниме-клуб ИТМО</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Возврат на главную -->
+      <nav>
+        <a href="/">
+          <svg viewBox="4 4 16 16" fill="currentColor" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+          На главную
+        </a>
+      </nav>
+
+      <hr class="nav-sep">
+
+      <p class="about">Загрузите экспорт с любого сайта из списка ниже, проверьте его и скачайте файл для импорта в AniList или другие сервисы.</p>
+
+      <hr class="nav-sep">
+
+      <div class="format-list">
+        <div class="format-item">
+          <svg viewBox="4 2 16 20" fill="currentColor" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <div class="format-text">
+            <span class="format-name">Шикимори (XML, JSON)</span>
+          </div>
+        </div>
+
+        <div class="format-item">
+          <svg viewBox="4 2 16 20" fill="currentColor" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <div class="format-text">
+            <span class="format-name">YummyAnime (JSON, HTML)</span>
+          </div>
+        </div>
+
+        <div class="format-item">
+          <svg viewBox="4 2 16 20" fill="currentColor" aria-hidden="true"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          <div class="format-text">
+            <span class="format-name">Anixart (CSV)</span>
+            <span class="hint">Нет MAL ID — поиск по русскому названию через Шикимори</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        <a href="mailto:kotatsu@itmo.ru">kotatsu@itmo.ru</a>
+        <div class="built-with">© Котацу — аниме-клуб Университета ИТМО, 2019-2026<br>Build with <a href="https://claude.com" target="_blank" rel="noopener">Claude</a></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-bar">
+        <h1>Конвертёр аниме-списков</h1>
+        <span id="mainStatus" aria-live="polite">Пересобирает список в формат MyAnimeList XML</span>
+      </div>
+
+      <div class="main-body">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Выбрать файл экспорта">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 16V4"/>
+            <path d="M7 9l5-5 5 5"/>
+            <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+          </svg>
+          <p class="dz-title">Перетащите файл сюда или нажмите, чтобы выбрать</p>
+          <p class="dz-hint">.xml, .json, .html, .csv</p>
+          <input type="file" id="fileInput" accept=".xml,.json,.csv,.html" hidden>
+        </div>
+
+        <div class="alert alert-error" id="alertError" role="alert" hidden></div>
+
+        <!-- Anixart:  предупреждение перед обращением к внешнему сервису -->
+        <div class="consent" id="anixartConsent" hidden>
+          <p class="consent-title">Готово к поиску: <b id="anixartRowCount">0</b> названий</p>
+          <p class="consent-text">Список будет проверен через Шикимори по русским названиям.</p>
+          <details class="skipped-details" id="anixartSkippedNote" hidden>
+            <summary>Пропущено при чтении файла: <b id="anixartSkippedCount">0</b></summary>
+            <ul id="anixartSkippedList"></ul>
+          </details>
+          <div class="actions">
+            <button class="btn btn-primary" id="anixartStartBtn">Начать поиск</button>
+            <button class="btn btn-secondary" id="anixartCancelBtn">Отмена</button>
+          </div>
+        </div>
+
+        <!-- Anixart: прогресс поиска -->
+        <div class="anixart-progress" id="anixartProgress" hidden>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          <p id="progressText">Ищем совпадения…</p>
+          <p class="hint" id="progressSubtext" hidden></p>
+        </div>
+
+        <!-- Anixart: проверка совпадений -->
+        <div class="result" id="anixartReview" hidden>
+          <div class="alert" id="shikimoriErrorAlert" hidden></div>
+          <div class="summary-bar" id="anixartSummary"></div>
+
+          <div class="review-step" id="reviewMulti">
+            <p class="step-title">Несколько вариантов на выбор. По умолчанию выбран первый результат AniList — проверьте.</p>
+            <div class="preview-wrap">
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>Название (Anixart)</th>
+                    <th>Совпадение на AniList</th>
+                  </tr>
+                </thead>
+                <tbody id="reviewMultiBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="review-step" id="reviewDuplicates" hidden>
+            <p class="step-title">Несколько названий сопоставлены с одной и той же записью на AniList — AniList иногда хранит части сезона одной записью, так что это не всегда ошибка. Проверьте и при необходимости исключите лишние.</p>
+            <div class="preview-wrap">
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>Название (Anixart)</th>
+                    <th>Совпадение на AniList</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="reviewDuplicatesBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="review-step" id="reviewUnresolved" hidden>
+            <p class="step-title">Не сопоставлено. Скачайте список и найдите их вручную.</p>
+            <div class="preview-wrap">
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>Название (Anixart)</th>
+                    <th>Причина</th>
+                  </tr>
+                </thead>
+                <tbody id="reviewUnresolvedBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" id="reviewBackBtn" hidden>Назад</button>
+            <button class="btn btn-primary" id="reviewNextBtn">Далее</button>
+            <button class="btn btn-secondary" id="downloadUnresolvedBtn" hidden>Скачать список несопоставленных (.txt)</button>
+            <button class="btn btn-primary" id="anixartConfirmBtn" hidden>Сформировать XML для MyAnimeList</button>
+            <button class="btn btn-secondary" id="anixartRestartBtn">Загрузить другой файл</button>
+          </div>
+        </div>
+
+        <div class="result" id="result" hidden>
+          <div class="summary-bar" id="summaryBar"></div>
+          <div class="preview-wrap">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>Название</th>
+                  <th>Статус</th>
+                  <th class="num">Оценка</th>
+                  <th class="num">Эпизоды</th>
+                  <th>Комментарий</th>
+                </tr>
+              </thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" id="downloadBtn">Скачать MAL XML</button>
+            <button class="btn btn-secondary" id="resetBtn">Загрузить другой файл</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/js/converter.js"></script>
+</body>
+</html>

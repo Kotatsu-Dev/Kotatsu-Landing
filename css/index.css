@@ -1,0 +1,75 @@
+/* ---- Главная страница: уникальные стили ---- */
+.sidebar {
+  flex: 0 0 380px;
+  max-width: 38%;
+  padding: 24px 18px;
+  overflow-y: auto;
+}
+
+.nav-sep { height: 1px; background: var(--border); margin: 12px 6px; border: 0; }
+
+.about { margin: 0; padding: 0 12px; color: var(--muted); line-height: 1.4; }
+
+/* ---- Общее для ссылок: соцсети, меню, галерея ---- */
+.socials a, .gallery-link {
+  text-decoration: none;
+  font-weight: 500;
+  transition: background .15s, color .15s;
+}
+.socials a:hover, .gallery-link:hover { background: var(--hover); color: var(--accent); }
+
+/* ---- Соцсети: иконки с подписями в ряд, по центру ---- */
+.socials {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  margin-top: 18px;
+}
+.socials a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 0;
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.socials svg { width: 32px; height: 32px; display: block; }
+
+/* ---- Правый блок галереи ---- */
+.gallery-bar {
+  flex: 0 0 auto;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.gallery-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 18px;
+}
+.gallery-link:hover { text-decoration: underline; }
+.gallery-link svg { width: 22px; height: 22px; flex: none; }
+.gallery-link .ext { width: 18px; height: 18px; color: var(--muted); }
+.gallery-embed {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  padding: 12px;
+}
+
+/* ---- Адаптив ---- */
+@media (max-width: 780px) {
+  .layout { flex-direction: column; height: auto; gap: 16px; }
+  .sidebar { flex-basis: auto; max-width: none; padding: 18px 10px; }
+  .gallery-bar { padding: 14px 10px; }
+  .gallery-embed { padding: 10px; }
+  .main { height: 80lvh; }
+}
