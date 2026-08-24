@@ -1,5 +1,10 @@
     class UserError extends Error {}
 
+    // События о ходе конвертации наружу. Слушателя может не быть — тогда ничего не происходит
+    function emit(name, detail) {
+      document.dispatchEvent(new CustomEvent('converter:' + name, { detail }));
+    }
+
     const VALID_STATUSES = new Set(['Completed', 'Watching', 'On-Hold', 'Dropped', 'Plan to Watch']);
     const JSON_STATUS_MAP = {
       completed: 'Completed',
@@ -59,7 +64,7 @@
 
     function sniffFormat(text) {
       if (text.startsWith('<')) {
-        // Jтличаем HTML по DOCTYPE <html>.
+        // Отличаем HTML по DOCTYPE <html>.
         if (/^<!doctype\s+html/i.test(text) || /^<html[\s>]/i.test(text)) {
           const doc = new DOMParser().parseFromString(text, 'text/html');
           if (doc.querySelector('li[data-shiki-id]')) {
@@ -154,7 +159,7 @@
     // ---- Разбор YummyAnime HTML ----
 
     // Статус определяется колонкой таблицы (заголовок <h3>)
-    // "Любимое" игноируем, т.к. это доп. отметка, а не статус
+    // "Любимое" игноируем - доп. метка, не статус
     const YUMMY_HTML_STATUS_MAP = {
       'Смотрю': 'Watching',
       'В планах': 'Plan to Watch',
@@ -543,11 +548,16 @@
         indices.forEach(idx => { if (results[idx].auto) results[idx] = { ...results[idx], auto: false }; });
       };
 
+      // shikimoriStats храним всегда, в том числе при успехе — иначе нет знаменателя
+      // для доли откатов на AniList. shikimoriError — производная, только для плашки
       let shikimoriError = null;
+      let shikimoriStats = null;
       const idxWithRu = allIdx.filter(idx => rows[idx].ruTitle);
       if (idxWithRu.length > 0) {
-        const { failedTitles, notFoundTitles, totalTitles, lastError } = await runShikimoriSearchPass(rows, idxWithRu, results, onStatus);
-        if (failedTitles > 0 || notFoundTitles > 0) shikimoriError = { failedTitles, notFoundTitles, totalTitles, lastError };
+        shikimoriStats = await runShikimoriSearchPass(rows, idxWithRu, results, onStatus);
+        if (shikimoriStats.failedTitles > 0 || shikimoriStats.notFoundTitles > 0) {
+          shikimoriError = shikimoriStats;
+        }
       }
 
       const idxAfterShikimori = allIdx.filter(idx => !results[idx]?.auto);
@@ -672,7 +682,7 @@
         if (narrowed) results[idx] = { candidates: [narrowed], chosen: narrowed, auto: false };
       });
 
-      return { results, shikimoriError };
+      return { results, shikimoriError, shikimoriStats };
     }
 
     function buildEntryFromAnixartMatch(row, match) {
@@ -733,6 +743,7 @@
       alertError.hidden = false;
       result.hidden = true;
       mainStatus.textContent = 'Не удалось обработать файл';
+      emit('error', { message });
     }
 
     function resetUI() {
@@ -780,11 +791,19 @@
       `).join('');
 
       downloadBtn.disabled = state.entries.length === 0;
+
+      emit('converted', {
+        format: state.format,
+        entries: state.entries.length,
+        skipped: state.skipped.length,
+      });
     }
 
     function handleFile(file) {
       resetUI();
       const isCsv = file.name.toLowerCase().endsWith('.csv');
+      // Только расширение: в имени файла может быть имя пользователя
+      emit('upload', { ext: file.name.toLowerCase().split('.').pop() });
       const reader = new FileReader();
       reader.onload = () => {
         try {
@@ -823,6 +842,7 @@
 
     function startAnixartConsent(rows, csvSkipped) {
       anixartState = { rows, csvSkipped, results: null };
+      emit('anixart-parsed', { rows: rows.length, csvSkipped: csvSkipped.length });
       dropzone.hidden = true;
       anixartRowCount.textContent = rows.length;
       if (csvSkipped.length > 0) {
@@ -855,9 +875,10 @@
       }
 
       try {
-        const { results, shikimoriError } = await runAnixartSearch(anixartState.rows, onStatus);
+        const { results, shikimoriError, shikimoriStats } = await runAnixartSearch(anixartState.rows, onStatus);
         anixartState.results = results;
         anixartState.shikimoriError = shikimoriError;
+        anixartState.shikimoriStats = shikimoriStats;
         anixartProgress.hidden = true;
         renderAnixartReview();
       } catch (err) {
@@ -906,6 +927,21 @@
       anixartState.notFound = notFound;
       anixartState.skippedMultiIdx = new Set();
       anixartState.excludedIdx = new Set();
+
+      // sh === null, если строк с русским названием не было и проход не запускался
+      const sh = anixartState.shikimoriStats;
+      emit('anixart-search', {
+        total: results.length,
+        shikimoriOk: sh ? sh.totalTitles - sh.failedTitles - sh.notFoundTitles : null,
+        shikimoriFailed: sh ? sh.failedTitles : null,
+        shikimoriNotFound: sh ? sh.notFoundTitles : null,
+        fellBackToAniList: sh ? sh.failedTitles + sh.notFoundTitles : null,
+        shikimoriError: sh && sh.lastError ? String(sh.lastError).slice(0, 100) : null,
+        auto: auto.length,
+        single: single.length,
+        multi: multi.length,
+        notFound: notFound.length,
+      });
 
       anixartSummary.innerHTML = `<span class="count"><b>${auto.length + single.length}</b> сопоставлено автоматически</span>`
         + `<span class="fmt-badge">Несколько вариантов: ${multi.length}</span>`
@@ -1004,6 +1040,7 @@
 
     function proceedPastMulti() {
       const duplicateGroups = computeDuplicateGroups();
+      anixartState.duplicateGroupCount = duplicateGroups.length;
       if (duplicateGroups.length > 0) {
         renderReviewDuplicates(duplicateGroups);
         showReviewStep('duplicates');
@@ -1030,6 +1067,7 @@
     }
 
     function downloadUnresolvedList() {
+      emit('download-unresolved', { count: anixartState.unresolved.length });
       const text = anixartState.unresolved.map(u => u.title).join('\n');
       const blob = new Blob([text], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
@@ -1048,6 +1086,26 @@
         .map(({ row, match }) => buildEntryFromAnixartMatch(row, match));
       const finalSkipped = [...anixartState.csvSkipped, ...anixartState.unresolved];
 
+      // Шаг выбора уже скрыт, но его select'ы живы — их читает computeFinalSelections.
+      // 0 — согласился с первым вариантом AniList, -1 — отказался, иначе выбрал другой
+      let multiKeptDefault = 0, multiChanged = 0, multiSkipped = 0;
+      anixartState.multi.forEach(({ idx }) => {
+        const val = Number(reviewMultiBody.querySelector(`tr[data-idx="${idx}"] select`).value);
+        if (val === -1) multiSkipped++;
+        else if (val === 0) multiKeptDefault++;
+        else multiChanged++;
+      });
+      emit('anixart-review', {
+        multi: anixartState.multi.length,
+        multiKeptDefault,
+        multiChanged,
+        multiSkipped,
+        duplicateGroups: anixartState.duplicateGroupCount ?? 0,
+        excluded: anixartState.excludedIdx.size,
+        unresolved: anixartState.unresolved.length,
+        finalEntries: finalEntries.length,
+      });
+
       if (finalEntries.length === 0) {
         anixartReview.hidden = true;
         dropzone.hidden = false;
@@ -1063,6 +1121,7 @@
     }
 
     function downloadResult() {
+      emit('download', { format: state.format, entries: state.entries.length });
       const xml = buildMalXml(state.entries);
       const blob = new Blob([xml], { type: 'application/xml' });
       const url = URL.createObjectURL(blob);
