@@ -198,7 +198,13 @@
 
     // ---- Разбор Anixart CSV ----
 
-    const ANIXART_STATUS_MAP = { 'Просмотрено': 'Completed' };
+    const ANIXART_STATUS_MAP = {
+      'Смотрю': 'Watching',
+      'В планах': 'Plan to Watch',
+      'Просмотрено': 'Completed',
+      'Брошено': 'Dropped',
+      'Отложено': 'On-Hold',
+    };
 
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
